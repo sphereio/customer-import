@@ -47,11 +47,12 @@
   },
   "dependencies": {
     "highland": "2.7.1",
+    "joi": "8.0.4",
     "sphere-node-sdk": "1.10.1",
     "underscore": "1.8.3",
     "underscore-mixins": "0.1.4"
   },
-  "cz-config": {
+  "czConfig": {
     "path": "node_modules/cz-conventional-changelog"
   }
 }

@@ -71,4 +71,26 @@ test('customer import module', t => {
     t.end()
   })
 
+  t.test('validation method', t => {
+
+    t.test('should resolve if the customer object is valid', t => {
+      const importer = new CustomerImport(logger, options)
+      importer.validateCustomer({ email: 'test@test.de' })
+      .then(() => {
+        t.pass('validation method resolves for valid customer object')
+        t.end()
+      })
+    })
+
+    t.test('should resolve if the customer object is valid', t => {
+      const importer = new CustomerImport(logger, options)
+      importer.validateCustomer({})
+      .catch(() => {
+        t.pass('validation method rejects for invalid customer object')
+        t.end()
+      })
+    })
+
+  })
+
 })
