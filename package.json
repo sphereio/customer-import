@@ -52,7 +52,9 @@
     "underscore": "1.8.3",
     "underscore-mixins": "0.1.4"
   },
-  "czConfig": {
-    "path": "node_modules/cz-conventional-changelog"
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   }
 }
