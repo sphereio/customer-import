@@ -1,10 +1,10 @@
-import test from 'tape'
+import { expect } from 'chai'
 import CustomerImport from '../src'
 import { SphereClient } from 'sphere-node-sdk'
 
 const PROJECT_KEY = 'sphere-node-customer-import'
 
-test('customer import module', t => {
+describe('customer import module', () => {
 
   const options = {
     config: {
@@ -14,13 +14,13 @@ test('customer import module', t => {
     },
     rest: {
       config: {},
-      GET: (/* endpoint, callback */) => {},
-      POST: () => (/* endpoint, payload, callback */) => {},
-      PUT: () => {},
-      DELETE: () => (/* endpoint, callback */) => {},
-      PAGED: () => (/* endpoint, callback */) => {},
-      _preRequest: () => {},
-      _doRequest: () => {}
+      // GET: (/* endpoint, callback */) => {},
+      // POST: () => (/* endpoint, payload, callback */) => {},
+      // PUT: () => {},
+      // DELETE: () => (/* endpoint, callback */) => {},
+      // PAGED: () => (/* endpoint, callback */) => {},
+      // _preRequest: () => {},
+      // _doRequest: () => {}
     }
   }
   const logger = {
@@ -30,64 +30,89 @@ test('customer import module', t => {
     error: console.error
   }
 
-  t.test('should be class', t => {
+  it('should be class', () => {
     const expected = 'function'
     const actual = typeof CustomerImport
 
-    t.equal(expected, actual, 'customerImport should be a function')
-
-    t.end()
+    expect(actual).to.equal(expected)
   })
 
-  t.test('should create a sphere client', t => {
+  it('should create a sphere client', () => {
     const importer = new CustomerImport(logger, options)
     const expected = SphereClient
     const actual = importer.client.constructor
 
-    t.equal(expected, actual, 'customerImport should have a sphere client')
-
-    t.end()
+    expect(actual).to.equal(expected)
   })
 
-  t.test('should provide a summary report method', t => {
+  it(`summaryReport should return no errors and no imported customers
+    if no customers were imported`, () => {
     const importer = new CustomerImport(logger, options)
-    const expected = 'function'
-    const actual = typeof importer.summaryReport
+    const expected = { errors: [], successfullImports: 0 }
+    const actual = importer.summaryReport()
 
-    t.equal(expected, actual,
-      'customerImport should have a summary report method')
-
-    t.end()
+    expect(actual).to.deep.equal(expected)
   })
 
-  t.test('should provide a performStream method', t => {
+  it('performStream function should exist', () => {
     const importer = new CustomerImport(logger, options)
     const expected = 'function'
     const actual = typeof importer.performStream
 
-    t.equal(expected, actual,
-      'customerImport should have a performStream method')
-
-    t.end()
+    expect(actual).to.equal(expected)
   })
 
-  t.test('validation method', t => {
+  it('performStream function should call it\'s callback', (done) => {
+    const callback = () => {
+      done()
+    }
+    const importer = new CustomerImport(logger, options)
 
-    t.test('should resolve if the customer object is valid', t => {
+    importer.performStream(null, callback)
+  })
+
+  describe('validation method', () => {
+
+    it('should resolve if the customer object is valid', (done) => {
       const importer = new CustomerImport(logger, options)
       importer.validateCustomer({ email: 'test@test.de' })
       .then(() => {
-        t.pass('validation method resolves for valid customer object')
-        t.end()
+        done()
       })
     })
 
-    t.test('should resolve if the customer object is valid', t => {
+    it('should reject if the customer object is invalid', (done) => {
       const importer = new CustomerImport(logger, options)
       importer.validateCustomer({})
       .catch(() => {
-        t.pass('validation method rejects for invalid customer object')
-        t.end()
+        done()
+      })
+    })
+
+  })
+
+  describe('importCustomer method', () => {
+
+    it('should increase the successfullImports counter', (done) => {
+      const importer = new CustomerImport(logger, options)
+      importer.importCustomer({ email: 'test@test.de' })
+      .then(() => {
+        const actual = importer.summary.successfullImports
+        const expected = 1
+        expect(actual).to.equal(expected)
+        done()
+      })
+    })
+
+    it(`should push the error and the corresponding customer
+    to the errors array`, (done) => {
+      const importer = new CustomerImport(logger, options)
+      importer.importCustomer({})
+      .then(() => {
+        const actual = importer.summary.errors.length
+        const expected = 1
+        expect(actual).to.equal(expected)
+        done()
       })
     })
 

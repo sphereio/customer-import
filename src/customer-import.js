@@ -7,7 +7,7 @@ const validate = Promise.promisify(Joi.validate)
 
 export default class CustomerImport {
 
-  constructor (logger, config = {}) {
+  constructor (logger, config) {
     this.logger = logger
     this.client = new SphereClient(config)
 
@@ -18,18 +18,18 @@ export default class CustomerImport {
   }
 
   summaryReport () {
-    return {}
+    return this.summary
   }
 
   performStream (batch, next) {
     // process batch
     // call next for next batch
-    next()
+    setTimeout(next, 1000)
   }
 
   importCustomer (customer) {
     // validate customer object
-    this.validateCustomer(customer)
+    return this.validateCustomer(customer)
     .then(() => {
       // customer object is valid
       // check if customer already exists
