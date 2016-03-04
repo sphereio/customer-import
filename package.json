@@ -1,6 +1,6 @@
 {
   "name": "ct-customer-import",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -9,6 +9,10 @@
     "test:watch": "watch 'npm test' src/ tests/",
     "build": "babel src --out-dir dist",
     "lint": "eslint src tests"
+  },
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/sphereio/customer-import.git"
   },
   "keywords": [
     "ctp",
