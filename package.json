@@ -6,7 +6,7 @@
   "scripts": {
     "commit": "git-cz",
     "test": "babel-tape-runner tests/**/*.js | faucet",
-    "testWithConsole": "babel-tape-runner tests/**/*.js",
+    "test:ci": "babel-tape-runner tests/**/*.js",
     "test:watch": "watch 'npm test' src/ tests/",
     "build": "babel src --out-dir dist",
     "lint": "eslint src tests",
