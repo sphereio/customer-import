@@ -1,13 +1,12 @@
-import { SphereClient } from 'sphere-node-sdk'
 import { ProjectCredentialsConfig } from 'sphere-node-utils'
 
-const getSphereClient = (projectKey) => {
+const getSphereClientCredentials = (projectKey) => {
   return ProjectCredentialsConfig.create()
   .then((credentials) => {
     const sphereCredentials = credentials.enrichCredentials({
       project_key: projectKey
     })
-    return Promise.resolve(new SphereClient({ config: sphereCredentials }))
+    return sphereCredentials
   })
 }
 
@@ -16,6 +15,6 @@ const generatePassword = () => {
 }
 
 export {
-  getSphereClient,
+  getSphereClientCredentials,
   generatePassword
 }
