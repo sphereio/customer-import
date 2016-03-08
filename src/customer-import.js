@@ -25,11 +25,18 @@ export default class CustomerImport {
     return this.summary
   }
 
-  performStream (batch, next) {
+  performStream (customers, next) {
     // process batch
     this.loadCustomerGroups()
-    // call next for next batch
-    setTimeout(next, 50)
+    return Promise.map(customers, (customer) => {
+      return this.importCustomer(customer)
+    })
+    .then(() => {
+      // call next for next batch
+      next()
+    })
+    // errors get catched in the node-cli which also calls for the next chunk
+    // if an error occured in this chunk
   }
 
   importCustomer (customer) {
@@ -64,7 +71,7 @@ export default class CustomerImport {
       .then(() => {
         this.summary.inserted.push(customer.email)
         this.summary.successfullImports = this.summary.successfullImports + 1
-        resolve()
+        resolve(customer)
       })
       .catch((error) => {
         const { body } = error

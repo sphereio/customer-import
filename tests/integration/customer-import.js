@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { expect } from 'chai'
 import CustomerImport from '../../src'
 import { SphereClient } from 'sphere-node-sdk'
@@ -12,7 +13,9 @@ const logger = {
   error: console.error
 }
 
-describe('customer import module', () => {
+describe('customer import module', function () {
+
+  this.timeout(10000)
 
   let client
   let customerImport
@@ -52,38 +55,90 @@ describe('customer import module', () => {
 
   it('should import a customer without a customer group', (done) => {
 
+    const customer = { email: 'philipp.sporrer@commercetools.de' }
     customerImport.loadCustomerGroups()
     .then(() => {
-      customerImport.importCustomer({
-        email: 'philipp.sporrer@commercetools.de'
-      })
+      customerImport.importCustomer(customer)
       .then(() => {
         const summary = customerImport.summaryReport()
         const actual = summary.errors.length
         const expected = 0
 
         expect(actual).to.equal(expected)
-        done()
+
+        client.customers.where(`email="${customer.email}"`).fetch()
+        .then(({ body: { results: customers } }) => {
+          const actual = customers.length
+          const expected = 1
+
+          expect(actual).to.equal(expected)
+          done()
+        })
       })
       .catch(done)
     })
   })
 
-  it('should import a customer with a new customer group', (done) => {
+  it('should import a customer with an address', (done) => {
 
+    const customer = {
+      email: 'philipp.sporrer@commercetools.de',
+      addresses: [{
+        streetName: 'Ernst-Platz-Straße 45a',
+        postalCode: '80992',
+        city: 'München',
+        country: 'DE'
+      }]
+    }
     customerImport.loadCustomerGroups()
     .then(() => {
-      customerImport.importCustomer({
-        email: 'philipp.sporrer@commercetools.de',
-        customerGroup: 'commercetools'
-      })
+      customerImport.importCustomer(customer)
       .then(() => {
         const summary = customerImport.summaryReport()
         const actual = summary.errors.length
         const expected = 0
 
         expect(actual).to.equal(expected)
-        done()
+        client.customers.where(`email="${customer.email}"`).fetch()
+        .then(({ body: { results: customers } }) => {
+          const actual = _.omit(customers[0].addresses[0], 'id')
+          const expected = customer.addresses[0]
+
+          expect(actual).to.deep.equal(expected)
+          done()
+        })
+      })
+    })
+    .catch(done)
+  })
+
+  it('should import a customer with a new customer group', (done) => {
+
+    const customer = {
+      email: 'philipp.sporrer@commercetools.de',
+      customerGroup: 'commercetools'
+    }
+    customerImport.loadCustomerGroups()
+    .then(() => {
+      customerImport.importCustomer(customer)
+      .then((customerWithGroupReference) => {
+        const summary = customerImport.summaryReport()
+        const actual = summary.errors.length
+        const expected = 0
+
+        expect(actual).to.equal(expected)
+
+        client.customers.where(`email="${customer.email}"`).fetch()
+        .then(({ body: { results: customers } }) => {
+          const actual = _.pick(customers[0], ['email', 'customerGroup'])
+          const expected = _.pick(
+            customerWithGroupReference,
+            ['email', 'customerGroup']
+          )
+
+          expect(actual).to.deep.equal(expected)
+          done()
+        })
       })
       .catch(done)
     })
@@ -91,21 +146,32 @@ describe('customer import module', () => {
 
   it('should import a customer with an existing customer group', (done) => {
 
+    const customer = {
+      email: 'philipp.sporrer@commercetools.de',
+      customerGroup: 'commercetools'
+    }
     customerImport.insertCustomerGroup('commercetools')
     .then(() => {
       customerImport.loadCustomerGroups()
       .then(() => {
-        customerImport.importCustomer({
-          email: 'philipp.sporrer@commercetools.de',
-          customerGroup: 'commercetools'
-        })
-        .then(() => {
+        customerImport.importCustomer(customer)
+        .then((customerWithGroupReference) => {
           const summary = customerImport.summaryReport()
           const actual = summary.errors.length
           const expected = 0
 
           expect(actual).to.equal(expected)
-          done()
+          client.customers.where(`email="${customer.email}"`).fetch()
+          .then(({ body: { results: customers } }) => {
+            const actual = _.pick(customers[0], ['email', 'customerGroup'])
+            const expected = _.pick(
+              customerWithGroupReference,
+              ['email', 'customerGroup']
+            )
+
+            expect(actual).to.deep.equal(expected)
+            done()
+          })
         })
         .catch(done)
       })

@@ -70,12 +70,31 @@ describe('customer import module', () => {
   })
 
   it('performStream function should call it\'s callback', (done) => {
-    const callback = () => {
-      done()
-    }
+    const callback = sinon.spy()
     const importer = new CustomerImport(logger, options)
 
-    importer.performStream(null, callback)
+    importer.performStream([], callback)
+    .then(() => {
+      expect(callback.calledOnce).to.equal(true)
+      done()
+    })
+  })
+
+  it(`performStream function should call importCustomer
+  for each customer in the given chunk`, (done) => {
+    const mockImportCustomer = sinon.spy(() => {})
+    const callback = () => {}
+    const customers = Array.from(new Array(10), () => ({ name: cuid() }))
+    const importer = new CustomerImport(logger, options)
+    sinon.stub(importer, 'importCustomer', mockImportCustomer)
+
+    importer.performStream(customers, callback)
+    .then(() => {
+      const actual = mockImportCustomer.callCount
+      const expected = customers.length
+      expect(expected).to.equal(actual)
+      done()
+    })
   })
 
   describe('validation method', () => {
