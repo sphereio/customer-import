@@ -53,6 +53,46 @@ describe('customer import module', function () {
     .catch(done)
   })
 
+  it('should import a complete customer', (done) => {
+    const customer = {
+      'customerNumber':'12341234',
+      'addresses':[{
+        'companyName':'Some random company',
+        'streetName':'Musterstraße 123',
+        'postalCode':'11111',
+        'city':'Stadt',
+        'country':'DE'
+      }],
+      'email':'test@test.xx',
+      'phone':'0000000000',
+      'randomField':'some random field',
+      'customerGroup':'XX-Pruducenter',
+      'vatId':'VADID123',
+      'randomField2':'345.000,00'
+    }
+    customerImport.loadCustomerGroups()
+    .then(() => {
+      customerImport.importCustomer(customer)
+      .then(() => {
+        const summary = customerImport.summaryReport()
+        const actual = summary.errors.length
+        const expected = 0
+
+        expect(actual).to.equal(expected)
+
+        client.customers.where(`email="${customer.email}"`).fetch()
+        .then(({ body: { results: customers } }) => {
+          const actual = customers.length
+          const expected = 1
+
+          expect(actual).to.equal(expected)
+          done()
+        })
+      })
+      .catch(done)
+    })
+  })
+
   it('should import a customer without a customer group', (done) => {
 
     const customer = { email: 'philipp.sporrer@commercetools.de' }

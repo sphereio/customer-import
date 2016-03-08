@@ -120,6 +120,6 @@ export default class CustomerImport {
   }
 
   validateCustomer (customer) {
-    return validate(customer, schema)
+    return validate(customer, schema, { stripUnknown: true, convert: true })
   }
 }
