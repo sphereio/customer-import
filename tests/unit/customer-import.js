@@ -10,25 +10,27 @@ const PROJECT_KEY = 'sphere-node-customer-import'
 describe('customer import module', () => {
 
   const options = {
-    config: {
-      project_key: PROJECT_KEY,
-      client_id: '*********',
-      client_secret: '*********'
+    sphereClientConfig: {
+      config: {
+        project_key: PROJECT_KEY,
+        client_id: '*********',
+        client_secret: '*********'
+      },
+      rest: {
+        config: {},
+        GET: (endpoint, callback) => {
+          callback(null, { statusCode: 200 }, { results: [] })
+        },
+        POST: (endpoint, payload, callback) => {
+          callback(null, { statusCode: 200 })
+        },
+        PUT: () => {},
+        DELETE: () => (/* endpoint, callback */) => {},
+        PAGED: () => (/* endpoint, callback */) => {},
+        _preRequest: () => {},
+        _doRequest: () => {}
+      }
     },
-    rest: {
-      config: {},
-      GET: (endpoint, callback) => {
-        callback(null, { statusCode: 200 }, { results: [] })
-      },
-      POST: (endpoint, payload, callback) => {
-        callback(null, { statusCode: 200 })
-      },
-      PUT: () => {},
-      DELETE: () => (/* endpoint, callback */) => {},
-      PAGED: () => (/* endpoint, callback */) => {},
-      _preRequest: () => {},
-      _doRequest: () => {}
-    }
   }
   const logger = {
     trace: console.log,
@@ -123,7 +125,9 @@ describe('customer import module', () => {
 
     beforeEach(() => {
       importer = new CustomerImport(logger, options)
-      const mockCustomerId = () => Promise.resolve(cuid())
+      const mockCustomerId = (customerGroup) => {
+        return customerGroup ? Promise.resolve(cuid()) : Promise.resolve()
+      }
       sinon.stub(importer, 'getCustomerGroupId', mockCustomerId)
     })
 
@@ -195,6 +199,28 @@ describe('customer import module', () => {
         importer.client.customers.save.restore()
         done()
       })
+    })
+
+    it(`should set shipping and billing address
+    if corresponding options are set`, function (done) {
+      sinon.spy(importer.client.customers, 'save')
+      importer.config.defaultShippingAddress = 0
+      importer.config.defaultBillingAddress = 0
+      importer.importCustomer({ email: 'test@test.de', customerGroup: 'test' })
+      .then(() => {
+        const savedCustomer = importer.client.customers.save.getCall(0).args[0]
+        const actual = _.pick(
+          savedCustomer,
+          ['defaultShippingAddressId', 'defaultBillingAddressId']
+        )
+        const expected = {
+          defaultShippingAddressId: 0,
+          defaultBillingAddressId: 0
+        }
+        expect(actual).to.deep.equal(expected)
+        done()
+      })
+      .catch(done)
     })
 
   })

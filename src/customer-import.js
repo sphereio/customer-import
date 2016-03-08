@@ -9,10 +9,15 @@ const validate = Promise.promisify(Joi.validate)
 
 export default class CustomerImport {
 
-  constructor (logger, config) {
+  constructor (logger, { sphereClientConfig, importerConfig }) {
     this.logger = logger
-    this.client = new SphereClient(config)
+    this.client = new SphereClient(sphereClientConfig)
     this.customerGroups = {}
+
+    this.config = _.assign({
+      defaultShippingAddress: null,
+      defaultBillingAddress: null
+    }, importerConfig)
 
     this.summary = {
       errors: [],
@@ -58,6 +63,12 @@ export default class CustomerImport {
     return new Promise((resolve, reject) => {
       // user does not exist yet -> generate password for him
       customer.password = generatePassword()
+      if (_.isNumber(this.config.defaultShippingAddress)) {
+        customer.defaultShippingAddressId = this.config.defaultShippingAddress
+      }
+      if (_.isNumber(this.config.defaultBillingAddress)) {
+        customer.defaultBillingAddressId = this.config.defaultBillingAddress
+      }
       // TODO should this be configurable?
       // so that you choose whether you already have customer group id or name
       this.getCustomerGroupId(customer.customerGroup)

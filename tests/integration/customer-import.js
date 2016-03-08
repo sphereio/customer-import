@@ -28,7 +28,10 @@ describe('customer import module', function () {
       }
       client = new SphereClient(options)
 
-      customerImport = new CustomerImport(logger, options)
+      customerImport = new CustomerImport(
+        logger,
+        { sphereClientConfig: options }
+      )
       done()
     })
   })
