@@ -77,7 +77,7 @@ describe('customer import module', function () {
     .then(() => {
       customerImport.importCustomer(customer)
       .then(() => {
-        const summary = customerImport.summaryReport()
+        const summary = JSON.parse(customerImport.summaryReport())
         const actual = summary.errors.length
         const expected = 0
 
@@ -103,7 +103,7 @@ describe('customer import module', function () {
     .then(() => {
       customerImport.importCustomer(customer)
       .then(() => {
-        const summary = customerImport.summaryReport()
+        const summary = JSON.parse(customerImport.summaryReport())
         const actual = summary.errors.length
         const expected = 0
 
@@ -137,7 +137,7 @@ describe('customer import module', function () {
     .then(() => {
       customerImport.importCustomer(customer)
       .then(() => {
-        const summary = customerImport.summaryReport()
+        const summary = JSON.parse(customerImport.summaryReport())
         const actual = summary.errors.length
         const expected = 0
 
@@ -165,7 +165,7 @@ describe('customer import module', function () {
     .then(() => {
       customerImport.importCustomer(customer)
       .then((customerWithGroupReference) => {
-        const summary = customerImport.summaryReport()
+        const summary = JSON.parse(customerImport.summaryReport())
         const actual = summary.errors.length
         const expected = 0
 
@@ -199,7 +199,7 @@ describe('customer import module', function () {
       .then(() => {
         customerImport.importCustomer(customer)
         .then((customerWithGroupReference) => {
-          const summary = customerImport.summaryReport()
+          const summary = JSON.parse(customerImport.summaryReport())
           const actual = summary.errors.length
           const expected = 0
 

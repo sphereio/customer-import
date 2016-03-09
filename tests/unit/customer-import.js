@@ -58,7 +58,7 @@ describe('customer import module', () => {
     if no customers were imported`, () => {
     const importer = new CustomerImport(logger, options)
     const expected = { errors: [], inserted: [], successfullImports: 0 }
-    const actual = importer.summaryReport()
+    const actual = JSON.parse(importer.summaryReport())
 
     expect(actual).to.deep.equal(expected)
   })

@@ -27,7 +27,7 @@ export default class CustomerImport {
   }
 
   summaryReport () {
-    return this.summary
+    return JSON.stringify(this.summary, null, 2)
   }
 
   processStream (customers, next) {
