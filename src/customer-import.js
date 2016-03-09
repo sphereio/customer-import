@@ -85,11 +85,7 @@ export default class CustomerImport {
         resolve(customer)
       })
       .catch((error) => {
-        const { body } = error
-        const errorCode = body ? body.errors[0].code : null
-        if (errorCode === 'DuplicateField') {
-          return reject('updating customers is not implement yet')
-        }
+        // TODO: potentially handle duplicate field error here
         return reject(error)
       })
     })

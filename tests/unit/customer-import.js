@@ -158,14 +158,15 @@ describe('customer import module', () => {
     })
 
     it('should handle existing customers', (done) => {
+      const error = {
+        body: {
+          errors: [{
+            code: 'DuplicateField'
+          }]
+        }
+      }
       const mockCustomerSave = () => {
-        return Promise.reject({
-          body: {
-            errors: [{
-              code: 'DuplicateField'
-            }]
-          }
-        })
+        return Promise.reject(error)
       }
       sinon.stub(importer.client.customers, 'save', mockCustomerSave)
       const customer = { email: 'test@test.de' }
@@ -174,7 +175,7 @@ describe('customer import module', () => {
         const actual = importer.summary.errors[0]
         const expected = {
           customer,
-          error: 'updating customers is not implement yet'
+          error: error
         }
         expect(actual).to.deep.equal(expected)
         importer.client.customers.save.restore()
