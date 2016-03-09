@@ -30,7 +30,7 @@ export default class CustomerImport {
     return this.summary
   }
 
-  performStream (customers, next) {
+  processStream (customers, next) {
     // process batch
     this.loadCustomerGroups()
     return Promise.map(customers, (customer) => {

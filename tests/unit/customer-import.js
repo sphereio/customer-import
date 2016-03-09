@@ -63,26 +63,26 @@ describe('customer import module', () => {
     expect(actual).to.deep.equal(expected)
   })
 
-  it('performStream function should exist', () => {
+  it('processStream function should exist', () => {
     const importer = new CustomerImport(logger, options)
     const expected = 'function'
-    const actual = typeof importer.performStream
+    const actual = typeof importer.processStream
 
     expect(actual).to.equal(expected)
   })
 
-  it('performStream function should call it\'s callback', (done) => {
+  it('processStream function should call it\'s callback', (done) => {
     const callback = sinon.spy()
     const importer = new CustomerImport(logger, options)
 
-    importer.performStream([], callback)
+    importer.processStream([], callback)
     .then(() => {
       expect(callback.calledOnce).to.equal(true)
       done()
     })
   })
 
-  it(`performStream function should call importCustomer
+  it(`processStream function should call importCustomer
   for each customer in the given chunk`, (done) => {
     const mockImportCustomer = sinon.spy(() => {})
     const callback = () => {}
@@ -90,7 +90,7 @@ describe('customer import module', () => {
     const importer = new CustomerImport(logger, options)
     sinon.stub(importer, 'importCustomer', mockImportCustomer)
 
-    importer.performStream(customers, callback)
+    importer.processStream(customers, callback)
     .then(() => {
       const actual = mockImportCustomer.callCount
       const expected = customers.length
