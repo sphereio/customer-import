@@ -12,8 +12,7 @@
     "test:watch": "watch 'npm test' src/ tests/",
     "build": "babel src --out-dir dist",
     "lint": "eslint src tests",
-    "prepublish": "npm run build",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm run build && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
