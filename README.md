@@ -38,22 +38,22 @@ In order for the cli to import customer, the file to import from must be JSON an
 }
 ```
 Then you can import this file using the cli:
-```
+```bash
 sphere-node-cli -t customer -p my-project-key -f /sample_dir/customers.json
 ```
 You can pass a custom configuration as described above via the `-c` operator:
-```
+```bash
 sphere-node-cli -t customer -p my-project-key -f /sample_dir/customers.json -c '{ "defaultShippingAddress": 0, "defaultBillingAddress": 0 }'
 ```
 
 ## Direct usage
 
 If you want more control, you can also use this library directly in JavaScript. To do this you first need to install it:
-```
+```bash
 npm install ct-customer-import --save-dev
 ```
 Then you can use it to import customers like so:
-```
+```js
 import CustomerImport from 'ct-customer-import'
 
 const customer = {
