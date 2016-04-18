@@ -55,8 +55,8 @@
     ]
   },
   "dependencies": {
+    "ajv": "4.0.0",
     "highland": "2.7.1",
-    "joi": "8.0.4",
     "lodash": "4.6.1",
     "sphere-node-sdk": "1.10.1",
     "underscore": "1.8.3",

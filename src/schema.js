@@ -1,18 +1,27 @@
-import Joi from 'joi'
-
-const schema = Joi.object().keys({
-  customerNumber: Joi.string(),
-  companyName: Joi.string(),
-  addresses: Joi.array().items(Joi.object().keys({
-    streetName: Joi.string(),
-    postalCode: Joi.number(),
-    city: Joi.string(),
-    country: Joi.string().min(2).max(2)
-  })),
-  email: Joi.string().required(),
-  phone: Joi.string(),
-  customerGroup: Joi.string(),
-  vatId: Joi.string()
-})
+const schema = {
+  type: 'object',
+  properties: {
+    customerNumber: { type: 'string' },
+    companyName: { type: 'string' },
+    addresses: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          streetName: { type: 'string' },
+          postalCode:  { type: 'string' },
+          city: { type: 'string' },
+          country: { type: 'string', minLength: 2, maxLength: 2 },
+        }
+      },
+    },
+    email: { type: 'string' },
+    phone: { type: 'string' },
+    customerGroup: { type: 'string' },
+    vatId: { type: 'string' },
+  },
+  required: ['email'],
+  additionalProperties: false,
+}
 
 export default schema

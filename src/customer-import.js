@@ -1,11 +1,12 @@
 import { SphereClient } from 'sphere-node-sdk'
 import { generatePassword } from './utils'
-import Joi from 'joi'
 import schema from './schema'
 import Promise from 'bluebird'
 import _ from 'lodash'
+import initAjv from 'ajv'
 
-const validate = Promise.promisify(Joi.validate)
+const ajv = initAjv({ removeAdditional: true, coerceTypes: true })
+const validate = ajv.compile(schema)
 
 export default class CustomerImport {
 
@@ -127,6 +128,11 @@ export default class CustomerImport {
   }
 
   validateCustomer (customer) {
-    return validate(customer, schema, { stripUnknown: true, convert: true })
+    const isValid = validate(customer)
+    if (isValid) {
+      return Promise.resolve()
+    } else {
+      return Promise.reject(validate.errors)
+    }
   }
 }
