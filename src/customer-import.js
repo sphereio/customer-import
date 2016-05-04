@@ -33,9 +33,12 @@ export default class CustomerImport {
 
   processStream (customers, next) {
     // process batch
-    this.loadCustomerGroups()
-    return Promise.map(customers, (customer) => {
-      return this.importCustomer(customer)
+    return this.loadCustomerGroups()
+    .then(() => {
+      // customer groups are loaded now
+      return Promise.map(customers, (customer) => {
+        return this.importCustomer(customer)
+      })
     })
     .then(() => {
       // call next for next batch
