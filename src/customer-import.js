@@ -114,7 +114,7 @@ export default class CustomerImport {
       return Promise.resolve(customerGroupId)
     }
     return this.insertCustomerGroup(customerGroupName)
-    .then(({ body: customerGroup }) => {
+    .then(customerGroup => {
       return customerGroup.id
     })
   }
@@ -128,6 +128,10 @@ export default class CustomerImport {
 
   insertCustomerGroup (customerGroupName) {
     return this.client.customerGroups.create({ groupName: customerGroupName })
+    .then(({ body: newCustomerGroup }) => {
+      this.customerGroups[customerGroupName] = newCustomerGroup.id
+      return newCustomerGroup
+    })
   }
 
   validateCustomer (customer) {

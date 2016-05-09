@@ -193,9 +193,9 @@ describe('customer import module', function () {
       email: 'philipp.sporrer@commercetools.de',
       customerGroup: 'commercetools'
     }
-    customerImport.insertCustomerGroup('commercetools')
+    customerImport.loadCustomerGroups()
     .then(() => {
-      customerImport.loadCustomerGroups()
+      customerImport.insertCustomerGroup('commercetools')
       .then(() => {
         customerImport.importCustomer(customer)
         .then((customerWithGroupReference) => {
