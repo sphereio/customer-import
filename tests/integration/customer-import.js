@@ -193,9 +193,9 @@ describe('customer import module', function () {
       email: 'philipp.sporrer@commercetools.de',
       customerGroup: 'commercetools'
     }
-    customerImport.loadCustomerGroups()
+    customerImport.insertCustomerGroup('commercetools')
     .then(() => {
-      customerImport.insertCustomerGroup('commercetools')
+      customerImport.loadCustomerGroups([customer])
       .then(() => {
         customerImport.importCustomer(customer)
         .then((customerWithGroupReference) => {
@@ -219,6 +219,30 @@ describe('customer import module', function () {
         .catch(done)
       })
     })
+  })
+
+  it(`should import multiple customers with the same (new)
+  customer group at once`, (done) => {
+    const customers = [{
+      email: 'philipp.sporrer@commercetools.de',
+      customerGroup: 'commercetools'
+    }, {
+      email: 'nicola.molinary@commercetools.de',
+      customerGroup: 'commercetools'
+    }, {
+      email: 'dali.zheng@commercetools.de',
+      customerGroup: 'commercetools'
+    }]
+    customerImport.processStream(customers, () => null)
+    .then(() => {
+      const summary = JSON.parse(customerImport.summaryReport())
+      const actual = summary.successfullImports
+      const expected = 3
+
+      expect(actual).to.equal(expected)
+      done()
+    })
+    .catch(done)
   })
 
 })

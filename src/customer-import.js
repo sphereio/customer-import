@@ -33,7 +33,7 @@ export default class CustomerImport {
 
   processStream (customers, next) {
     // process batch
-    return this.loadCustomerGroups()
+    return this.loadCustomerGroups(customers)
     .then(() => {
       // customer groups are loaded now
       return Promise.map(customers, (customer) => {
@@ -95,14 +95,27 @@ export default class CustomerImport {
     })
   }
 
-  loadCustomerGroups () {
-    return _.keys(this.customerGroups).length === 0 ? this.client.customerGroups
-    .process(({ body: { results: customerGroups } }) => {
-      customerGroups.forEach((customerGroup) => {
-        this.customerGroups[customerGroup.name] = customerGroup.id
-      })
-      return Promise.resolve()
-    }) : Promise.resolve()
+  loadCustomerGroups (customers = []) {
+    return (
+      _.keys(this.customerGroups).length === 0 ? this.client.customerGroups
+      .process(({ body: { results: customerGroups } }) => {
+        customerGroups.forEach((customerGroup) => {
+          this.customerGroups[customerGroup.name] = customerGroup.id
+        })
+        return Promise.resolve()
+      }) : Promise.resolve()
+    ).then(() => {
+      // collect customer groups of customers
+      const customerGroupsNames = _.compact(_.uniq(
+        customers.map(c => c.customerGroup)
+      )).filter(customer =>
+        // filter out all existing customer groups
+        !~Object.keys(this.customerGroups).indexOf(customer)
+      )
+      return Promise.map(customerGroupsNames, group =>
+        this.insertCustomerGroup(group)
+      )
+    })
   }
 
   getCustomerGroupId (customerGroupName) {
