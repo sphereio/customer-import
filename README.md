@@ -18,7 +18,7 @@ This library is built to be used in conjunction with [sphere-node-cli](https://g
 - create a customer group for the given name if none exists yet
 - setting a default shipping and billing address
 
-### Configuration
+## Configuration
 The configuration object may contain:
 - `sphereClientConfig`: see the [sphere-node-sdk docs](http://sphereio.github.io/sphere-node-sdk/) for more information on this
 - `defaultShippingAddress`: Index of the address in the customer's `addresses` list that should be used as the shipping address
