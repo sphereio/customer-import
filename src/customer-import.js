@@ -68,10 +68,10 @@ export default class CustomerImport {
       // user does not exist yet -> generate password for him
       customer.password = generatePassword()
       if (_.isNumber(this.config.defaultShippingAddress)) {
-        customer.defaultShippingAddressId = this.config.defaultShippingAddress
+        customer.defaultShippingAddress = this.config.defaultShippingAddress
       }
       if (_.isNumber(this.config.defaultBillingAddress)) {
-        customer.defaultBillingAddressId = this.config.defaultBillingAddress
+        customer.defaultBillingAddress = this.config.defaultBillingAddress
       }
       // TODO should this be configurable?
       // so that you choose whether you already have customer group id or name

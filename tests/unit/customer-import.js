@@ -212,11 +212,11 @@ describe('customer import module', () => {
         const savedCustomer = importer.client.customers.save.getCall(0).args[0]
         const actual = _.pick(
           savedCustomer,
-          ['defaultShippingAddressId', 'defaultBillingAddressId']
+          ['defaultShippingAddress', 'defaultBillingAddress']
         )
         const expected = {
-          defaultShippingAddressId: 0,
-          defaultBillingAddressId: 0
+          defaultShippingAddress: 0,
+          defaultBillingAddress: 0
         }
         expect(actual).to.deep.equal(expected)
         done()
