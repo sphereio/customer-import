@@ -28,39 +28,36 @@ describe('customer import module', function () {
       }
       client = new SphereClient(options)
 
-      customerImport = new CustomerImport(
-        logger,
-        { sphereClientConfig: options }
-      )
-      done()
-    })
-  })
-
-  afterEach((done) => {
-    // remove all customers
-    const deleteAll = (service) => {
-      return client[service].process(({ body: { results } }) => {
-        return Promise.map(results, (customer) => {
-          return client[service].byId(customer.id)
-          .delete(customer.version)
+      // remove all customers
+      const deleteAll = (service) => {
+        return client[service].process(({ body: { results } }) => {
+          return Promise.map(results, (customer) => {
+            return client[service].byId(customer.id)
+            .delete(customer.version)
+          })
         })
+      }
+      deleteAll('customers')
+      .then(() => deleteAll('customerGroups'))
+      .then(() => deleteAll('types'))
+      .then(() => {
+        customerImport = new CustomerImport(
+          logger,
+          { sphereClientConfig: options }
+        )
+        done()
       })
-    }
-    deleteAll('customers')
-    .then(() => {
-      return deleteAll('customerGroups')
     })
-    .then(() => {
-      done()
-    })
-    .catch(done)
   })
 
   it('should import a complete customer', (done) => {
     const customer = {
       'customerNumber':'12341234',
+      'firstName': 'Max',
+      'lastName': 'Mustermann',
+      'externalId': '1-nc0r98nc1-390r8cn-1309rcn8',
+      'companyName':'Some random company',
       'addresses':[{
-        'companyName':'Some random company',
         'streetName':'Musterstraße 123',
         'postalCode':'11111',
         'city':'Stadt',
@@ -126,30 +123,119 @@ describe('customer import module', function () {
 
     const customer = {
       email: 'philipp.sporrer@commercetools.de',
+      companyName: 'Some random company',
       addresses: [{
-        streetName: 'Ernst-Platz-Straße 45a',
-        postalCode: '80992',
-        city: 'München',
+        streetName: 'Musterstraße 123',
+        postalCode: '11111',
+        city: 'Stadt',
         country: 'DE'
       }]
     }
     customerImport.loadCustomerGroups()
+    .then(() => customerImport.importCustomer(customer))
     .then(() => {
-      customerImport.importCustomer(customer)
-      .then(() => {
-        const summary = JSON.parse(customerImport.summaryReport())
-        const actual = summary.errors.length
-        const expected = 0
+      const summary = JSON.parse(customerImport.summaryReport())
+      const actual = summary.errors.length
+      const expected = 0
 
-        expect(actual).to.equal(expected)
-        client.customers.where(`email="${customer.email}"`).fetch()
-        .then(({ body: { results: customers } }) => {
-          const actual = _.omit(customers[0].addresses[0], 'id')
-          const expected = customer.addresses[0]
+      expect(actual).to.equal(expected)
+      return client.customers.where(`email="${customer.email}"`).fetch()
+    })
+    .then(({ body: { results: customers } }) => {
+      const actual = _.omit(customers[0].addresses[0], 'id')
+      const expected = customer.addresses[0]
 
-          expect(actual).to.deep.equal(expected)
-          done()
-        })
+      expect(actual).to.deep.equal(expected)
+      done()
+    })
+    .catch(done)
+  })
+
+  it('should import a customer with a default shipping and billing address',
+  (done) => {
+
+    const customer = {
+      email: 'philipp.sporrer@commercetools.de',
+      companyName: 'Some random company',
+      addresses: [{
+        streetName: 'Musterstraße 123',
+        postalCode: '11111',
+        city: 'Stadt',
+        country: 'DE'
+      }]
+    }
+    customerImport.config.defaultShippingAddress = 0
+    customerImport.config.defaultBillingAddress = 0
+    customerImport.loadCustomerGroups()
+    .then(() => customerImport.importCustomer(customer))
+    .then(() => {
+      const summary = JSON.parse(customerImport.summaryReport())
+      const actual = summary.errors.length
+      const expected = 0
+
+      expect(actual).to.equal(expected)
+      return client.customers.where(`email="${customer.email}"`).fetch()
+    })
+    .then(({ body: { results: customers } }) => {
+      const { id } = customers[0].addresses[0]
+
+      expect(id).to.equal(customers[0].defaultBillingAddressId)
+      expect(id).to.equal(customers[0].defaultShippingAddressId)
+      done()
+    })
+    .catch(done)
+  })
+
+  it('should import a customer with custom fields', (done) => {
+
+    let customer
+    client.types.create({
+      key: 'custom-customer',
+      name: { en: 'custom customer' },
+      resourceTypeIds: ['customer'],
+      fieldDefinitions: [
+        {
+          name: 'customField1',
+          type: { name: 'String' },
+          required: false,
+          label: { label: 'Custom field 1' },
+          inputHint: 'SingleLine'
+        },
+        {
+          name: 'customField2',
+          type: { name: 'Boolean' },
+          required: false,
+          label: { en: 'Custom field 2' },
+        }
+      ]
+    }).then(({ body: customType }) => {
+      customer = {
+        email: 'philipp.sporrer@commercetools.de',
+        custom: {
+          type: {
+            key: customType.key
+          },
+          fields: {
+            customField1: 'customValue1',
+            customField2: true
+          }
+        }
+      }
+      return customerImport.importCustomer(customer)
+    })
+    .then(() => {
+      const summary = JSON.parse(customerImport.summaryReport())
+      const actual = summary.errors.length
+      const expected = 0
+
+      expect(actual).to.equal(expected)
+      client.customers.where(`email="${customer.email}"`).fetch()
+      .then(({ body: { results: customers } }) => {
+        const actual = customers[0].custom.fields
+        const expected = customer.custom.fields
+
+        expect(actual).to.deep.equal(expected)
+        done()
       })
     })
     .catch(done)
