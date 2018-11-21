@@ -5,7 +5,7 @@ import { SphereClient } from 'sphere-node-sdk'
 import { getSphereClientCredentials } from '../../src/utils'
 import Promise from 'bluebird'
 
-const PROJECT_KEY = 'sphere-node-customer-import-int-test'
+const PROJECT_KEY = 'sphere-node-customer-import'
 const logger = {
   trace: console.log,
   debug: console.log,
