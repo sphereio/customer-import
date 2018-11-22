@@ -1,6 +1,6 @@
 {
   "name": "sphere-customer-import",
-  "version": "0.0.0-semantically-released",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:watch": "watch 'npm test' src/ tests/",
     "build": "babel src --out-dir dist",
     "lint": "eslint src tests",
-    "semantic-release": "semantic-release pre && npm run build && npm publish && semantic-release post"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,6 @@
     "isparta": "4.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
-    "semantic-release": "^4.3.5",
     "sinon": "1.17.3",
     "sphere-node-utils": "^1.0.0",
     "watch": "0.17.1"

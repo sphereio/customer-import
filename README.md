@@ -3,7 +3,6 @@
 [![Travis][travis-badge]][travis-url]
 [![Codecov][codecov-badge]][codecov-url]
 [![npm][npm-lic-badge]][npm-lic-url]
-[![semantic-release][semantic-release-badge]][semantic-release-url]
 [![Commitizen friendly][commitizen-badge]][commitizen-url]
 [![NPM version][npm-image]][npm-url]
 
@@ -95,9 +94,6 @@ customerImport.loadCustomerGroups()
 
 [npm-lic-badge]: https://img.shields.io/npm/l/sphere-customer-import.svg?style=flat-square
 [npm-lic-url]: http://spdx.org/licenses/MIT
-
-[semantic-release-badge]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square
-[semantic-release-url]: https://github.com/semantic-release/semantic-release
 
 [commitizen-badge]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square
 [commitizen-url]: http://commitizen.github.io/cz-cli/
